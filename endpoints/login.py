@@ -1,7 +1,7 @@
 from flask import Blueprint
 from flask import make_response, request
 import json
-from models import User
+from models import User, Branch
 from constants import *
 
 login_blueprint = Blueprint('login_blueprint', __name__)
@@ -15,9 +15,11 @@ def login():
         user = User.query.filter(User.username == request_data["username"], User.password == request_data["password"]).first()
         print("here")
         if user:
+            branch = Branch.query.filter(Branch.id == user.branch_id).first()
             response_body = user.to_map()
             response_body["status"] = 200
             response_body["remarks"] = "Success"
+            response_body["branch_name"] = branch["name"]
             if response_body["is_admin"]:
                 response_body["auth_token"] = ADMIN_AUTH_TOKEN
             else:
