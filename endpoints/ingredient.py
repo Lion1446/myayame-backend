@@ -80,7 +80,7 @@ def ingredient():
             request_data = request.data
             request_data = json.loads(request_data.decode('utf-8')) 
             if request_data["auth_token"] in [AUTH_TOKEN, ADMIN_AUTH_TOKEN]:
-                id = request_data.get('id')
+                id = request.args.get('id')
                 if id is None:
                     resp = make_response({"status": 400, "remarks": "Missing id in the request body"})
                 else:
