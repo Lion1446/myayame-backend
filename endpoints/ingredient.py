@@ -8,6 +8,28 @@ from models import db
 ingredient_blueprint = Blueprint('ingredient_blueprint', __name__)
 
 
+@ingredient_blueprint.route('/ingredients', methods = ["GET"])
+def ingredients():
+    try:
+        branch_id = request.args.get('branch_id')
+        if branch_id is None:
+            resp = make_response({"status": 400, "remarks": "Missing branch id in the query string"})
+        else:
+            instance = Ingredients.query.filter(Ingredients.branch_id == branch_id).first()
+            if instance is None:
+                resp = make_response({"status": 404, "remarks": "Store does not have ingredients."})
+            else:
+                response_body = instance.to_map()
+                response_body["status"] = 200
+                response_body["remarks"] = "Success"
+                resp = make_response(response_body)
+    except Exception as e:
+        print(e)
+        resp = make_response({"status": 500, "remarks": "Internal server error"})
+    resp.headers['Access-Control-Allow-Origin'] = '*'
+    return resp
+
+
 # curl -X POST -d "{\"admin_auth_token\": \"WvNM3UJL2kHZQ1ewI7RzGxVh0n8o6YKS\", \"name\": \"Ayame - SM Seaside\"}" -H "Content-Type: application/json" http://127.0.0.1:5000/branch
 @ingredient_blueprint.route('/ingredient', methods = ["POST", "GET"])
 def ingredient():
