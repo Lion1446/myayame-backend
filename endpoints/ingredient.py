@@ -34,7 +34,7 @@ def ingredients():
 
 
 # curl -X POST -d "{\"admin_auth_token\": \"WvNM3UJL2kHZQ1ewI7RzGxVh0n8o6YKS\", \"name\": \"Ayame - SM Seaside\"}" -H "Content-Type: application/json" http://127.0.0.1:5000/branch
-@ingredient_blueprint.route('/ingredient', methods = ["POST", "GET"])
+@ingredient_blueprint.route('/ingredient', methods = ["POST", "GET", "PUT"])
 def ingredient():
     try:
         if request.method == "POST":
@@ -63,7 +63,7 @@ def ingredient():
                     resp = make_response({"status": 200, "remarks": "Success"})
             else:
                 resp = make_response({"status": 403, "remarks": "Access denied"})
-        elif request.method:
+        elif request.method == "GET":
             id = request.args.get('id')
             if id is None:
                 resp = make_response({"status": 400, "remarks": "Missing id in the query string"})
@@ -76,6 +76,27 @@ def ingredient():
                     response_body["status"] = 200
                     response_body["remarks"] = "Success"
                     resp = make_response(response_body)
+        elif request.method == "PUT":
+            request_data = request.data
+            request_data = json.loads(request_data.decode('utf-8')) 
+            if request_data["auth_token"] in [AUTH_TOKEN, ADMIN_AUTH_TOKEN]:
+                id = request_data.get('id')
+                if id is None:
+                    resp = make_response({"status": 400, "remarks": "Missing id in the request body"})
+                else:
+                    instance = Ingredients.query.filter(Ingredients.id == id).first()
+                    if instance is None:
+                        resp = make_response({"status": 404, "remarks": "Ingredient does not exist."})
+                    else:
+                        instance.name = request_data["name"]
+                        instance.unit = request_data["unit"]
+                        instance.branch_id = request_data["branch_id"]
+                        instance.tolerance = request_data["tolerance"]
+                        instance.category = request_data["category"]
+                        db.session.commit()
+                        resp = make_response({"status": 200, "remarks": "Success"})
+            else:
+                resp = make_response({"status": 403, "remarks": "Access denied"})
     except Exception as e:
         print(e)
         resp = make_response({"status": 500, "remarks": "Internal server error"})
