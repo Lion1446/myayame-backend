@@ -49,7 +49,7 @@ def ingredient():
                     Ingredients.category == request_data["category"],
                     ).all()
                 if query:
-                    resp = make_response({"status": 400, "remarks": "User already exists."})
+                    resp = make_response({"status": 400, "remarks": "Ingredient already exists."})
                 else:
                     instance = Ingredients(
                         name = request_data["name"],
