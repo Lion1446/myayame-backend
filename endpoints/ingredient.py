@@ -16,7 +16,7 @@ def ingredients():
             resp = make_response({"status": 400, "remarks": "Missing branch id in the query string"})
         else:
             instances = Ingredients.query.filter(Ingredients.branch_id == branch_id).all()
-            if instances is None:
+            if len(instances) == 0:
                 resp = make_response({"status": 404, "remarks": "Store does not have ingredients."})
             else:
                 response_body = {}
