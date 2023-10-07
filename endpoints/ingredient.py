@@ -15,11 +15,14 @@ def ingredients():
         if branch_id is None:
             resp = make_response({"status": 400, "remarks": "Missing branch id in the query string"})
         else:
-            instance = Ingredients.query.filter(Ingredients.branch_id == branch_id).first()
-            if instance is None:
+            instances = Ingredients.query.filter(Ingredients.branch_id == branch_id).all()
+            if instances is None:
                 resp = make_response({"status": 404, "remarks": "Store does not have ingredients."})
             else:
-                response_body = instance.to_map()
+                response_body = {}
+                response_body["ingredients"] = []
+                for instance in instances:
+                    response_body["ingredients"].append(instance.to_map())
                 response_body["status"] = 200
                 response_body["remarks"] = "Success"
                 resp = make_response(response_body)
