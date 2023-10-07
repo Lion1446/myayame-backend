@@ -34,7 +34,7 @@ def ingredients():
 
 
 # curl -X POST -d "{\"admin_auth_token\": \"WvNM3UJL2kHZQ1ewI7RzGxVh0n8o6YKS\", \"name\": \"Ayame - SM Seaside\"}" -H "Content-Type: application/json" http://127.0.0.1:5000/branch
-@ingredient_blueprint.route('/ingredient', methods = ["POST", "GET", "PUT"])
+@ingredient_blueprint.route('/ingredient', methods = ["POST", "GET", "PUT", "DELETE"])
 def ingredient():
     try:
         if request.method == "POST":
@@ -97,6 +97,15 @@ def ingredient():
                         resp = make_response({"status": 200, "remarks": "Success"})
             else:
                 resp = make_response({"status": 403, "remarks": "Access denied"})
+        elif request.method == "DELETE":
+            id = request.args.get('id')
+            instance = Ingredients.query.filter(Ingredients.id == id).first()
+            if instance is None:
+                resp = make_response({"status": 404, "remarks": "Ingredient does not exist."})
+            else:
+                db.session.delete(instance)
+                db.session.commit()
+                resp = make_response({"status": 200, "remarks": "Success"})
     except Exception as e:
         print(e)
         resp = make_response({"status": 500, "remarks": "Internal server error"})
