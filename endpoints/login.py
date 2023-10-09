@@ -31,6 +31,6 @@ def login():
         resp = make_response(response_body)
     except Exception as e:
         print("Error is:", e)
-        resp = make_response({"status": 500, "remarks": "Internal server error"})
+        resp = make_response({"status": 500, "remarks": "Internal server error: {e}"})
     resp.headers['Access-Control-Allow-Origin'] = '*'
     return resp
