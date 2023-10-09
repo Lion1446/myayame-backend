@@ -73,7 +73,6 @@ class Item(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     ingredient_id = db.Column(db.Integer, nullable=False)
     inventory_id = db.Column(db.Integer, nullable=False)
-    previous_id = db.Column(db.Integer, nullable=True)
     quantity = db.Column(db.Float, nullable=False)
     received = db.Column(db.Float, nullable=False)
     consumed = db.Column(db.Float, nullable=False)
@@ -86,7 +85,6 @@ class Item(db.Model):
             "id": self.id,
             "ingredient_id": self.ingredient_id,
             "inventory_id": self.inventory_id,
-            "previous_id": self.previous_id,
             "quantity": self.quantity,
             "received": self.received,
             "consumed": self.consumed,
