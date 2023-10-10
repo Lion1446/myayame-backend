@@ -74,7 +74,6 @@ class Item(db.Model):
     ingredient_id = db.Column(db.Integer, nullable=False)
     inventory_id = db.Column(db.Integer, nullable=False)
     quantity = db.Column(db.Float, nullable=False)
-    received = db.Column(db.Float, nullable=False)
     consumed = db.Column(db.Float, nullable=False)
     expired = db.Column(db.Float, nullable=False)
     spoiled = db.Column(db.Float, nullable=False)
@@ -86,7 +85,6 @@ class Item(db.Model):
             "ingredient_id": self.ingredient_id,
             "inventory_id": self.inventory_id,
             "quantity": self.quantity,
-            "received": self.received,
             "consumed": self.consumed,
             "expired": self.expired,
             "spoiled": self.spoiled,
