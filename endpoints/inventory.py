@@ -16,7 +16,7 @@ def inventory():
             request_data = request.data
             request_data = json.loads(request_data.decode('utf-8')) 
             if request_data["auth_token"] in [AUTH_TOKEN, ADMIN_AUTH_TOKEN]:
-                formatted_date = datetime.strptime(request_data['datetime_created'], "%m/%d/%Y %H:%M:%S")
+                formatted_date = datetime.datetime.strptime(request_data['datetime_created'], "%m/%d/%Y %H:%M:%S")
                 query = Inventory.query.filter(
                     func.DATE(Inventory.datetime_created) == formatted_date.date(),
                     Inventory.is_starting == True,
