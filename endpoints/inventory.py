@@ -35,20 +35,25 @@ def inventory():
                     db.session.commit()
                     resp = make_response({"status": 200, "remarks": "Success"})
                 else:
-                    instance = Inventory(
+                    inventory_instance = Inventory(
                         datetime_created = formatted_date,
                         is_starting = True
                     )
+                    db.session.add(inventory_instance)
+                    db.session.commit()
+                    query = Inventory.query.filter(
+                        func.DATE(Inventory.datetime_created) == formatted_date.date(),
+                        Inventory.is_starting == True,
+                    ).all()
                     item = Item(
                         ingredient_id = request_data["ingredient_id"],
-                        inventory_id = instance.id,
+                        inventory_id = query.id,
                         quantity = request_data["quantity"],
                         consumed = 0,
                         expired = 0,
                         spoiled = 0,
                         bad_order = 0
                     )
-                    db.session.add(instance)
                     db.session.add(item)
                     db.session.commit()
                     resp = make_response({"status": 200, "remarks": "Success"})
