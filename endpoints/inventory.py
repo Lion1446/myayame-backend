@@ -86,8 +86,10 @@ def inventory():
                     for item in items:
                         item_body = item.to_map()
                         ingredient = Ingredients.query.filter(Ingredients.id == item.ingredient_id).first()
-                        item_body.update(ingredient.to_map())
-                        response_body["items"].append(item_body)
+                        ingredient_body = ingredient.to_map()
+                        body = dict(item_body)
+                        body.update((k, v) for k, v in ingredient_body.items() if k not in item_body)
+                        response_body["items"].append(body)
                     response_body["inventory"] = inventory.to_map()
                     response_body["status"] = 200
                     response_body["remarks"] = "Success"
