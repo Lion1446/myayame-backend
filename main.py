@@ -5,6 +5,7 @@ from endpoints.login import login_blueprint
 from endpoints.branch import branch_blueprint
 from endpoints.user import user_blueprint
 from endpoints.ingredient import ingredient_blueprint
+from endpoints.inventory import inventory_blueprint
 
 ## ======================= STARTUPS =================================
 
@@ -21,6 +22,7 @@ app.register_blueprint(login_blueprint)
 app.register_blueprint(branch_blueprint)
 app.register_blueprint(user_blueprint)
 app.register_blueprint(ingredient_blueprint)
+app.register_blueprint(inventory_blueprint)
 
 ## ======================= ENDPOINTS =================================
 
