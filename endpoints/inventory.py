@@ -9,7 +9,7 @@ from models import db
 
 inventory_blueprint = Blueprint('inventory_blueprint', __name__)
 
-@inventory_blueprint.route('/inventory/starting', methods = ["POST"])
+@inventory_blueprint.route('/inventory_starting', methods = ["POST"])
 def inventory():
     try:
         if request.method == "POST":
