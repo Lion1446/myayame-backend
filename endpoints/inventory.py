@@ -3,7 +3,7 @@ from sqlalchemy import func
 from flask import Blueprint
 from flask import make_response, request
 import json
-from models import Inventory, Item
+from models import Inventory, Item, Ingredients
 from constants import *
 from models import db
 
@@ -80,7 +80,10 @@ def inventory():
                     response_body["items"] = []
                     items = Item.query.filter(Item.inventory_id == inventory.id).all()
                     for item in items:
-                        response_body["items"].append(item.to_map())
+                        item_body = item.to_map()
+                        ingredient = Ingredients.query.filter(Ingredients.id == item.ingredient_id).first()
+                        item_body.update(ingredient.to_map())
+                        response_body["items"].append(item_body)
                     response_body["inventory"] = inventory.to_map()
                     response_body["status"] = 200
                     response_body["remarks"] = "Success"
