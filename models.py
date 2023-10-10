@@ -57,6 +57,7 @@ class Ingredients(db.Model):
 class Inventory(db.Model):
     __tablename__ = "inventory"
     id = db.Column(db.Integer, primary_key=True)
+    branch_id = db.Column(db.Integer, nullable=False)
     datetime_created = db.Column(db.DateTime, nullable=False, default=datetime.now())
     is_starting = db.Column(db.Boolean, nullable=False)
 
