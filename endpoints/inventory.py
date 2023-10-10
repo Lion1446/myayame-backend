@@ -20,7 +20,7 @@ def inventory():
                 query = Inventory.query.filter(
                     func.DATE(Inventory.datetime_created) == formatted_date.date(),
                     Inventory.is_starting == True,
-                    Inventory.branch_id == request_data["ingredient_id"]
+                    Inventory.branch_id == request_data["branch_id"]
                     ).first()
                 if query:
                     item = Item(
