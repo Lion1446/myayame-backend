@@ -9,7 +9,7 @@ from models import db
 
 inventory_blueprint = Blueprint('inventory_blueprint', __name__)
 
-@inventory_blueprint.route('/inventory_starting', methods = ["POST"])
+@inventory_blueprint.route('/inventory_starting', methods = ["POST", "GET"])
 def inventory():
     try:
         if request.method == "POST":
@@ -59,6 +59,28 @@ def inventory():
                     resp = make_response({"status": 200, "remarks": "Success"})
             else:
                 resp = make_response({"status": 403, "remarks": "Access denied"})
+        elif request.method == "GET":
+            date = request.args.get('date')
+            if date is None:
+                resp = make_response({"status": 400, "remarks": "Missing date in the query string"})
+            else:
+                formatted_date = datetime.datetime.strptime(date, "%m/%d/%Y %H:%M:%S")
+                inventory = Inventory.query.filter(
+                        func.DATE(Inventory.datetime_created) == formatted_date.date(),
+                        Inventory.is_starting == True,
+                    ).first()
+                if inventory is None:
+                    resp = make_response({"status": 404, "remarks": "Inventory does not exist."})
+                else:
+                    response_body = {}
+                    response_body["items"] = []
+                    items = Item.query.filter(Item.inventory_id == inventory.id).all()
+                    for item in items:
+                        response_body["items"].append(item.to_map())
+                    response_body["inventory"] = inventory.to_map()
+                    response_body["status"] = 200
+                    response_body["remarks"] = "Success"
+                    resp = make_response(response_body)
     except Exception as e:
         resp = make_response({"status": 500, "remarks": f"Internal server error: {e}"})
     resp.headers['Access-Control-Allow-Origin'] = '*'
