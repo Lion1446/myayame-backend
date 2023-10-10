@@ -88,6 +88,18 @@ def inventory():
                     response_body["status"] = 200
                     response_body["remarks"] = "Success"
                     resp = make_response(response_body)
+        elif request.method == "DELETE":
+            item_id = request.args.get('item_id')
+            if item_id is not None:
+                item = Item.query.filter(Item.id == item_id).first()
+                if item:
+                    db.session.delete(item)
+                    db.session.commit()
+                    resp = make_response({"status": 200, "remarks": "Success"})
+                else:
+                    resp = make_response({"status": 404, "remarks": "Item not found"})
+            else:
+                resp = make_response({"status": 400, "remarks": "Missing item_id parameter"})
     except Exception as e:
         resp = make_response({"status": 500, "remarks": f"Internal server error: {e}"})
     resp.headers['Access-Control-Allow-Origin'] = '*'
