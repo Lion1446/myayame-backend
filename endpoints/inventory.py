@@ -63,13 +63,15 @@ def inventory():
                 resp = make_response({"status": 403, "remarks": "Access denied"})
         elif request.method == "GET":
             date = request.args.get('date')
-            if date is None:
-                resp = make_response({"status": 400, "remarks": "Missing date in the query string"})
+            branch_id = request.args.get('branch_id')
+            if date is None or branch_id is None:
+                resp = make_response({"status": 400, "remarks": "Missing required parameters in the query string"})
             else:
                 formatted_date = datetime.datetime.strptime(date, "%m/%d/%Y %H:%M:%S")
                 inventory = Inventory.query.filter(
                         func.DATE(Inventory.datetime_created) == formatted_date.date(),
                         Inventory.is_starting == True,
+                        Inventory.branch_id == branch_id
                     ).first()
                 if inventory is None:
                     resp = make_response({"status": 404, "remarks": "Inventory does not exist."})
