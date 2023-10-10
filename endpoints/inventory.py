@@ -26,7 +26,6 @@ def inventory():
                         ingredient_id = request_data["ingredient_id"],
                         inventory_id = query.id,
                         quantity = request_data["quantity"],
-                        received = request_data["quantity"],
                         consumed = 0,
                         expired = 0,
                         spoiled = 0,
