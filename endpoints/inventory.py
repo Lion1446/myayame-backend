@@ -44,7 +44,7 @@ def inventory():
                     query = Inventory.query.filter(
                         func.DATE(Inventory.datetime_created) == formatted_date.date(),
                         Inventory.is_starting == True,
-                    ).all()
+                    ).first()
                     item = Item(
                         ingredient_id = request_data["ingredient_id"],
                         inventory_id = query.id,
