@@ -23,16 +23,20 @@ def inventory():
                     Inventory.branch_id == request_data["branch_id"]
                     ).first()
                 if query:
-                    item = Item(
-                        ingredient_id = request_data["ingredient_id"],
-                        inventory_id = query.id,
-                        quantity = request_data["quantity"],
-                        consumed = 0,
-                        expired = 0,
-                        spoiled = 0,
-                        bad_order = 0
-                    )
-                    db.session.add(item)
+                    item_query = Item.query.filter(Item.ingredient_id == request_data["ingredient_id"]).first()
+                    if item_query:
+                        item_query.quantity = item_query.quantity + request_data["quantity"]
+                    else:
+                        item = Item(
+                            ingredient_id = request_data["ingredient_id"],
+                            inventory_id = query.id,
+                            quantity = request_data["quantity"],
+                            consumed = 0,
+                            expired = 0,
+                            spoiled = 0,
+                            bad_order = 0
+                        )
+                        db.session.add(item)
                     db.session.commit()
                     resp = make_response({"status": 200, "remarks": "Success"})
                 else:
@@ -91,9 +95,15 @@ def inventory():
         elif request.method == "DELETE":
             item_id = request.args.get('item_id')
             if item_id is not None:
-                item = Item.query.filter(Item.id == item_id).first()
-                if item:
-                    db.session.delete(item)
+                item_starting = Item.query.filter(Item.id == item_id).first()
+                inventory_starting = Inventory.query.filter(Inventory.id == item_starting.inventor_id).first()
+                inventory_closing = Inventory.query.filter(func.DATE(Inventory.datetime_created) == inventory_starting.datetime_created, Inventory.is_starting == False).first()
+                item_closing = Item.query.filter(Item.inventory_id == inventory_closing.id, Item.ingredient_id == item_starting.ingredient_id).first()
+                if item_closing:
+                    db.session.delete(item_closing)
+                    db.session.commit()
+                if item_starting:
+                    db.session.delete(item_starting)
                     db.session.commit()
                     resp = make_response({"status": 200, "remarks": "Success"})
                 else:
