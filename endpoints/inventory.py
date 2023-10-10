@@ -98,10 +98,11 @@ def inventory():
                 item_starting = Item.query.filter(Item.id == item_id).first()
                 inventory_starting = Inventory.query.filter(Inventory.id == item_starting.inventory_id).first()
                 inventory_closing = Inventory.query.filter(func.DATE(Inventory.datetime_created) == func.DATE(inventory_starting.datetime_created), Inventory.is_starting == False).first()
-                item_closing = Item.query.filter(Item.inventory_id == inventory_closing.id, Item.ingredient_id == item_starting.ingredient_id).first()
-                if item_closing:
-                    db.session.delete(item_closing)
-                    db.session.commit()
+                if inventory_closing:
+                    item_closing = Item.query.filter(Item.inventory_id == inventory_closing.id, Item.ingredient_id == item_starting.ingredient_id).first()
+                    if item_closing:
+                        db.session.delete(item_closing)
+                        db.session.commit()
                 if item_starting:
                     db.session.delete(item_starting)
                     db.session.commit()
