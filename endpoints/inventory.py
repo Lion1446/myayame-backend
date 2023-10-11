@@ -9,7 +9,7 @@ from models import db
 
 inventory_blueprint = Blueprint('inventory_blueprint', __name__)
 
-@inventory_blueprint.route('/inventory_starting', methods = ["POST", "GET", "DELETE"])
+@inventory_blueprint.route('/inventory_starting', methods = ["POST", "GET", "DELETE", "PATCH"])
 def inventory():
     try:
         if request.method == "POST":
@@ -113,6 +113,19 @@ def inventory():
                     resp = make_response({"status": 404, "remarks": "Item not found"})
             else:
                 resp = make_response({"status": 400, "remarks": "Missing item_id parameter"})
+        elif request.method == "PATCH":
+            request_data = request.data
+            request_data = json.loads(request_data.decode('utf-8')) 
+            if request_data["auth_token"] in [AUTH_TOKEN, ADMIN_AUTH_TOKEN]:
+                starting_item = Item.query.filter(Item.id == request_data["id"]).first()
+                if starting_item:
+                    starting_item.quantity = request_data["quantity"]
+                    db.session.commit()
+                    resp = make_response({"status": 200, "remarks": "Success"})
+                else:
+                    resp = make_response({"status": 404, "remarks": "Item not found"})
+            else:
+                resp = make_response({"status": 403, "remarks": "Access denied"})
     except Exception as e:
         resp = make_response({"status": 500, "remarks": f"Internal server error: {e}"})
     resp.headers['Access-Control-Allow-Origin'] = '*'
