@@ -1,4 +1,4 @@
-import datetime
+import datetime, timedelta
 from sqlalchemy import func
 from flask import Blueprint
 from flask import make_response, request
@@ -9,8 +9,9 @@ from models import db
 
 inventory_blueprint = Blueprint('inventory_blueprint', __name__)
 
+
 @inventory_blueprint.route('/inventory_starting', methods = ["POST", "GET", "DELETE", "PATCH"])
-def inventory():
+def inventory_starting():
     try:
         if request.method == "POST":
             request_data = request.data
@@ -130,3 +131,90 @@ def inventory():
         resp = make_response({"status": 500, "remarks": f"Internal server error: {e}"})
     resp.headers['Access-Control-Allow-Origin'] = '*'
     return resp
+
+
+@inventory_blueprint.route('/inventory_closing', methods = ["POST", "GET", "PATCH"])
+def inventory_closing():
+    try:
+        if request.method == "POST":
+            request_data = request.data
+            request_data = json.loads(request_data.decode('utf-8')) 
+            if request_data["auth_token"] in [AUTH_TOKEN, ADMIN_AUTH_TOKEN]:
+                # get the closing inventory based on date and branch
+                formatted_date = datetime.datetime.strptime(request_data['date'], "%m/%d/%Y %H:%M:%S")
+                closing_inventory = Inventory.query.filter(
+                    func.DATE(Inventory.datetime_created) == formatted_date.date(),
+                    Inventory.is_starting == False,
+                    Inventory.branch_id == request_data["branch_id"]
+                    ).first()
+                if closing_inventory is None:
+                    closing_inventory = Inventory(
+                        branch_id = request_data["branch_id"],
+                        datetime_created = formatted_date,
+                        is_starting = False
+                    )
+                    db.session.add(closing_inventory)
+                    db.session.commit()
+                    closing_inventory = Inventory.query.filter(
+                        func.DATE(Inventory.datetime_created) == formatted_date.date(),
+                        Inventory.is_starting == False,
+                        Inventory.branch_id == request_data["branch_id"]
+                        ).first()
+                
+                
+                # create the succeeding day opening inventory
+                next_day = formatted_date + timedelta(days=1)
+                opening_inventory = Inventory.query.filter(
+                    func.DATE(Inventory.datetime_created) == next_day.date(),
+                    Inventory.is_starting == True,
+                    Inventory.branch_id == request_data["branch_id"]
+                    ).first()
+                if opening_inventory is None:
+                    opening_inventory = Inventory(
+                        branch_id = request_data["branch_id"],
+                        datetime_created = next_day,
+                        is_starting = True
+                    )
+                    db.session.add(opening_inventory)
+                    db.session.commit()
+                    opening_inventory = Inventory.query.filter(
+                        func.DATE(Inventory.datetime_created) == formatted_date.date(),
+                        Inventory.is_starting == False,
+                        Inventory.branch_id == request_data["branch_id"]
+                        ).first()
+
+                # create the items
+                for item in request_data["closing_items"]:
+                    # create an instance of that item
+                    closing_item = Item(
+                        ingredient_id = item["ingredient_id"],
+                        inventory_id = closing_inventory.id,
+                        quantity = item["new_quantity"],
+                        consumed = item["consumed"],
+                        expired = item["expired"],
+                        spoiled = item["spoiled"],
+                        bad_order = item["bad_order"]
+                    )
+                    db.session.add(closing_item)
+                    db.session.commit()
+                    opening_item = Item(
+                        ingredient_id = item["ingredient_id"],
+                        inventory_id = opening_inventory.id,
+                        quantity = item["new_quantity"],
+                        consumed = item["consumed"],
+                        expired = item["expired"],
+                        spoiled = item["spoiled"],
+                        bad_order = item["bad_order"]
+                    )
+                    db.session.add(opening_item)
+                    db.session.commit() 
+                resp = make_response({"status": 200, "remarks": "Success"})
+            else:
+                resp = make_response({"status": 403, "remarks": "Access denied"})
+                
+
+    except Exception as e:
+        resp = make_response({"status": 500, "remarks": f"Internal server error: {e}"})
+    resp.headers['Access-Control-Allow-Origin'] = '*'
+    return resp
+
