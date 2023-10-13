@@ -1,4 +1,5 @@
-import datetime, timedelta
+import datetime
+from datetime import timedelta
 from sqlalchemy import func
 from flask import Blueprint
 from flask import make_response, request
