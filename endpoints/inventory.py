@@ -180,7 +180,7 @@ def inventory_closing():
                     db.session.commit()
                     opening_inventory = Inventory.query.filter(
                         func.DATE(Inventory.datetime_created) == formatted_date.date(),
-                        Inventory.is_starting == False,
+                        Inventory.is_starting == True,
                         Inventory.branch_id == request_data["branch_id"]
                         ).first()
 
