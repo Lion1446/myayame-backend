@@ -108,14 +108,14 @@ class Products(db.Model):
 class ProductIngredient(db.Model):
     __tablename__ = "product_ingredient"
     id = db.Column(db.Integer, primary_key=True)
-    branch_id = db.Column(db.Integer, nullable=False)
     product_id = db.Column(db.Integer, nullable=False)
+    ingredient_id = db.Column(db.Integer, nullable=False)
     quantity = db.Column(db.Float, nullable=False)
 
     def to_map(self):
         return {
             "id": self.id,
-            "branch_id": self.branch_id,
             "product_id": self.product_id,
+            "ingredient_id": self.ingredient_id,
             "quantity": self.quantity
         }

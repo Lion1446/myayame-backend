@@ -48,7 +48,13 @@ def products():
                     response_body["remarks"] = "Success"
                     resp = make_response(response_body)
         elif request.method == "DELETE":
-            product = Products.query.get(id)
+            product_id = request.args.get('product_id')
+            product_ingredients = ProductIngredient.query.filter(ProductIngredient.product_id == product_id).all()
+            if product_ingredients is not None:
+                for pi in product_ingredients:
+                    db.session.delete(pi)
+                db.session.commit()
+            product = Products.query.get(product_id)
             if product is None:
                 resp = make_response({"status": 404, "remarks": "Product not found"})
             else:
@@ -81,12 +87,12 @@ def product_ingredients():
             request_data = request.data
             request_data = json.loads(request_data.decode('utf-8')) 
             if request_data["auth_token"] in [AUTH_TOKEN, ADMIN_AUTH_TOKEN]:
-                product_ingredient_query = ProductIngredient.query.filter(Products.branch_id == request_data["branch_id"], Products.product_id == request_data["product_id"], Products.quantity == request_data["quantity"]).first()
+                product_ingredient_query = ProductIngredient.query.filter(Products.ingredient_id == request_data["ingredient_id"], Products.product_id == request_data["product_id"]).first()
                 if product_ingredient_query:
                     resp = make_response({"status": 400, "remarks": "Ingredient in this product already exists."})
                 else:
                     product_ingredient = ProductIngredient(
-                        branch_id=request_data["branch_id"],
+                        ingredient_id=request_data["ingredient_id"],
                         product_id=request_data["product_id"],
                         quantity=request_data["quantity"]
                     )
@@ -96,12 +102,11 @@ def product_ingredients():
             else:
                 resp = make_response({"status": 403, "remarks": "Access denied"})
         elif request.method == "GET":
-            branch_id = request.args.get('branch_id')
             product_id = request.args.get('product_id')
-            if branch_id or product_id is None:
+            if product_id is None:
                 resp = make_response({"status": 400, "remarks": "Missing id in the query string"})
             else:
-                product_ingredients = ProductIngredient.query.filter(ProductIngredient.branch_id == branch_id, ProductIngredient.product_id == product_id).all()
+                product_ingredients = ProductIngredient.query.filter(ProductIngredient.product_id == product_id).all()
                 if product_ingredients is None:
                     resp = make_response({"status": 404, "remarks": "No ingredients found for this product."})
                 else:
