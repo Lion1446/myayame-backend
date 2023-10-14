@@ -4,7 +4,7 @@ from sqlalchemy import func
 from flask import Blueprint
 from flask import make_response, request
 import json
-from models import Inventory, Item, Ingredients, Products
+from models import Inventory, Item, Ingredients, Products, ProductIngredient
 from constants import *
 from models import db
 
@@ -74,3 +74,70 @@ def products():
     resp.headers['Access-Control-Allow-Origin'] = '*'
     return resp
 
+@products_blueprint.route('/product_ingredients', methods=['POST', 'GET', 'DELETE', 'PATCH'])
+def product_ingredients():
+    try:
+        if request.method == "POST":
+            request_data = request.data
+            request_data = json.loads(request_data.decode('utf-8')) 
+            if request_data["auth_token"] in [AUTH_TOKEN, ADMIN_AUTH_TOKEN]:
+                product_ingredient_query = ProductIngredient.query.filter(Products.branch_id == request_data["branch_id"], Products.product_id == request_data["product_id"], Products.quantity == request_data["quantity"]).first()
+                if product_ingredient_query:
+                    resp = make_response({"status": 400, "remarks": "Ingredient in this product already exists."})
+                else:
+                    product_ingredient = ProductIngredient(
+                        branch_id=request_data["branch_id"],
+                        product_id=request_data["product_id"],
+                        quantity=request_data["quantity"]
+                    )
+                    db.session.add(product_ingredient)
+                    db.session.commit()
+                    resp = make_response({"status": 200, "remarks": "Success"})
+            else:
+                resp = make_response({"status": 403, "remarks": "Access denied"})
+        elif request.method == "GET":
+            branch_id = request.args.get('branch_id')
+            product_id = request.args.get('product_id')
+            if branch_id or product_id is None:
+                resp = make_response({"status": 400, "remarks": "Missing id in the query string"})
+            else:
+                product_ingredients = ProductIngredient.query.filter(ProductIngredient.branch_id == branch_id, ProductIngredient.product_id == product_id).all()
+                if product_ingredients is None:
+                    resp = make_response({"status": 404, "remarks": "No ingredients found for this product."})
+                else:
+                    response_body = {}
+                    response_body["product_ingredients"] = []
+                    for pi in product_ingredients:
+                        ingredient = Ingredients.query.filter(Ingredients.id == pi.ingredient_id).first()
+                        product_ingredient_detail = pi.to_map()
+                        product_ingredient_detail["ingredient_details"] = ingredient.to_map()
+                        response_body["product_ingredients"].append(product_ingredient_detail)
+                    response_body["status"] = 200
+                    response_body["remarks"] = "Success"
+                    resp = make_response(response_body)
+        elif request.method == "DELETE":
+            pi = ProductIngredient.query.get(id)
+            if pi is None:
+                resp = make_response({"status": 404, "remarks": "Product Ingredient not found"})
+            else:
+                db.session.delete(pi)
+                db.session.commit()
+                resp = make_response({"status": 200, "remarks": "Product Ingredient deleted successfully"})
+        elif request.method == "PATCH":
+            pi = ProductIngredient.query.get(id)
+            if pi is None:
+                resp = make_response({"status": 404, "remarks": "Product Ingredient not found"})
+            else:
+                request_data = request.data
+                request_data = json.loads(request_data.decode('utf-8')) 
+                if request_data["auth_token"] in [AUTH_TOKEN, ADMIN_AUTH_TOKEN]:
+                    pi.quantity = request_data["quantity"]
+                    db.session.commit()
+                    resp = make_response({"status": 200, "remarks": "Product Ingredient updated successfully"})
+                else:
+                    resp = make_response({"status": 403, "remarks": "Access denied"})
+    except Exception as e:
+        print(e)
+        resp = make_response({"status": 500, "remarks": f"Internal server error: {e}"})
+    resp.headers['Access-Control-Allow-Origin'] = '*'
+    return resp
