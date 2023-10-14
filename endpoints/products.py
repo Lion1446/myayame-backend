@@ -87,7 +87,7 @@ def product_ingredients():
             request_data = request.data
             request_data = json.loads(request_data.decode('utf-8')) 
             if request_data["auth_token"] in [AUTH_TOKEN, ADMIN_AUTH_TOKEN]:
-                product_ingredient_query = ProductIngredient.query.filter(Products.ingredient_id == request_data["ingredient_id"], Products.product_id == request_data["product_id"]).first()
+                product_ingredient_query = ProductIngredient.query.filter(ProductIngredient.ingredient_id == request_data["ingredient_id"], ProductIngredient.product_id == request_data["product_id"]).first()
                 if product_ingredient_query:
                     resp = make_response({"status": 400, "remarks": "Ingredient in this product already exists."})
                 else:
