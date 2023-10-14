@@ -43,7 +43,7 @@ def products():
                     response_body = {}
                     response_body["products"] = []
                     for product in products:
-                        response_body["products"].add(product.to_map())
+                        response_body["products"].append(product.to_map())
                     response_body["status"] = 200
                     response_body["remarks"] = "Success"
                     resp = make_response(response_body)
