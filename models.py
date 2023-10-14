@@ -91,3 +91,31 @@ class Item(db.Model):
             "spoiled": self.spoiled,
             "bad_order": self.bad_order
         }
+
+class Products(db.Model):
+    __tablename__ = "products"
+    id = db.Column(db.Integer, primary_key=True)
+    branch_id = db.Column(db.Integer, nullable=False)
+    name = db.Column(db.String(100), nullable=False)
+
+    def to_map(self):
+        return {
+            "id": self.id,
+            "branch_id": self.branch_id,
+            "name": self.name
+        }
+    
+class ProductIngredient(db.Model):
+    __tablename__ = "product_ingredient"
+    id = db.Column(db.Integer, primary_key=True)
+    branch_id = db.Column(db.Integer, nullable=False)
+    product_id = db.Column(db.Integer, nullable=False)
+    quantity = db.Column(db.Float, nullable=False)
+
+    def to_map(self):
+        return {
+            "id": self.id,
+            "branch_id": self.branch_id,
+            "product_id": self.product_id,
+            "quantity": self.quantity
+        }
