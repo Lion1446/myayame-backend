@@ -11,7 +11,7 @@ from models import db
 
 products_blueprint = Blueprint('products_blueprint', __name__)
 
-@products_blueprint.route('/products', methods = ["POST", "GET"])
+@products_blueprint.route('/products', methods = ["POST", "GET", "DELETE", "PATCH"])
 def products():
     try:
         if request.method == "POST":
@@ -70,7 +70,7 @@ def products():
                     resp = make_response({"status": 403, "remarks": "Access denied"})
     except Exception as e:
         print(e)
-        resp = make_response({"status": 500, "remarks": "Internal server error"})
+        resp = make_response({"status": 500, "remarks": f"Internal server error: {e}"})
     resp.headers['Access-Control-Allow-Origin'] = '*'
     return resp
 
