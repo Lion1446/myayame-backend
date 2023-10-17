@@ -121,6 +121,7 @@ def product_ingredients():
                     response_body["remarks"] = "Success"
                     resp = make_response(response_body)
         elif request.method == "DELETE":
+            id = request.args.get('product_id')
             pi = ProductIngredient.query.get(id)
             if pi is None:
                 resp = make_response({"status": 404, "remarks": "Product Ingredient not found"})
