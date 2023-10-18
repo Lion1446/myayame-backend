@@ -1,7 +1,7 @@
 import datetime
 import json
 from flask import Blueprint, make_response, request, jsonify
-from models import db, Sales, SalesItem
+from models import db, Sales, SalesItem, Products
 from sqlalchemy import func
 from constants import AUTH_TOKEN, ADMIN_AUTH_TOKEN
 
@@ -22,7 +22,12 @@ def get_sales():
             if sales_query:
                 sales_items = SalesItem.query.filter(SalesItem.sales_id == sales_query.id).all()
                 response_body = {}
-                response_body["sales_items"] = [item.to_map() for item in sales_items]
+                response_body["sales_items"] = []
+                for item in sales_items:
+                    product = Products.query.get(item.product_id)
+                    si = item.to_map()
+                    si["name"] = product.name
+                    response_body["sales_items"].append(si)
                 response_body["status"] = 200
                 response_body["remarks"] = "Success"
                 return make_response(response_body)
