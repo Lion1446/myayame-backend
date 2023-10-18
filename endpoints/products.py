@@ -130,6 +130,7 @@ def product_ingredients():
                 db.session.commit()
                 resp = make_response({"status": 200, "remarks": "Product Ingredient deleted successfully"})
         elif request.method == "PATCH":
+            id = request.args.get('product_id')
             pi = ProductIngredient.query.get(id)
             if pi is None:
                 resp = make_response({"status": 404, "remarks": "Product Ingredient not found"})
