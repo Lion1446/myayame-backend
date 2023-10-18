@@ -65,6 +65,10 @@ def get_sales():
             return make_response({"status": 200, "remarks": "Success"})
         
         elif request.method == "PATCH":
+            sales_item_id = request.args.get('sales_item_id')
+            sales_item = SalesItem.query.get(sales_item_id)
+            if sales_item is None:
+                return make_response({"status": 404, "remarks": "Sales item not found"})
             request_data = request.data
             request_data = json.loads(request_data.decode('utf-8')) 
             if request_data["auth_token"] in [AUTH_TOKEN, ADMIN_AUTH_TOKEN]:   
