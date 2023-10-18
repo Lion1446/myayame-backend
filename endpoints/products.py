@@ -62,7 +62,8 @@ def products():
                 db.session.commit()
                 resp = make_response({"status": 200, "remarks": "Success"})
         elif request.method == "PATCH":
-            product = Products.query.get(id)
+            product_id = request.args.get('product_id')
+            product = Products.query.get(product_id)
             if product is None:
                 resp = make_response({"status": 404, "remarks": "Product not found"})
             else:
