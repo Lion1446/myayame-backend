@@ -119,3 +119,31 @@ class ProductIngredient(db.Model):
             "ingredient_id": self.ingredient_id,
             "quantity": self.quantity
         }
+    
+class Sales(db.Model):
+    __tablename__ = "sales"
+    id = db.Column(db.Integer, primary_key=True)
+    datetime_created = db.Column(db.DateTime, nullable=False, default=datetime.now())
+    branch_id = db.Column(db.Integer, nullable=False)
+
+    def to_map(self):
+        return {
+            "id": self.id,
+            "datetime_created": self.datetime_created,
+            "branch_id": self.branch_id
+        }
+
+class SalesItem(db.Model):
+    __tablename__ = "sales_item"
+    id = db.Column(db.Integer, primary_key=True)
+    sales_id = db.Column(db.Integer, nullable=False)
+    product_id = db.Column(db.Integer, nullable=False)
+    quantity = db.Column(db.Integer, nullable=False)
+
+    def to_map(self):
+        return {
+            "id": self.id,
+            "sales_id": self.sales_id,
+            "product_id": self.product_id,
+            "quantity": self.quantity
+        }

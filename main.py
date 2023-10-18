@@ -7,6 +7,8 @@ from endpoints.user import user_blueprint
 from endpoints.ingredient import ingredient_blueprint
 from endpoints.inventory import inventory_blueprint
 from endpoints.products import products_blueprint
+from endpoints.sales import sales_blueprint
+
 
 ## ======================= STARTUPS =================================
 
@@ -25,6 +27,8 @@ app.register_blueprint(user_blueprint)
 app.register_blueprint(ingredient_blueprint)
 app.register_blueprint(inventory_blueprint)
 app.register_blueprint(products_blueprint)
+app.register_blueprint(sales_blueprint)
+
 
 ## ======================= ENDPOINTS =================================
 
