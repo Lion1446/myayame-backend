@@ -40,8 +40,12 @@ def get_sales():
                 formatted_date = datetime.datetime.strptime(request_data["date"], "%m/%d/%Y %H:%M:%S")
                 sales_query = Sales.query.filter(func.DATE(Sales.datetime_created) == formatted_date.date(), Sales.branch_id == request_data["branch_id"]).first()
                 if sales_query:
-                    sales_item = SalesItem(product_id = request_data["product_id"], quantity = request_data["quantity"], sales_id = sales_query.id)
-                    db.session.add(sales_item)
+                    sales_item_query = SalesItem.query.filter(SalesItem.product_id == request_data["product_id"]).first()
+                    if sales_item_query:
+                        sales_item_query.quantity = sales_item_query.quantity + request_data["quantity"]
+                    else:
+                        sales_item = SalesItem(product_id = request_data["product_id"], quantity = request_data["quantity"], sales_id = sales_query.id)
+                        db.session.add(sales_item)
                     db.session.commit()
                     return make_response({"status": 200, "remarks": "Success"})
                 else:
