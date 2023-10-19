@@ -83,12 +83,12 @@ def audit():
                     ingredient_query = Ingredients.query.filter(Ingredients.id == product_ingredient.ingredient_id).first()
                     is_found = False
                     for item in inventory_items:
-                        if item["ingredient_id"] == product_ingredient.id:
+                        if item["ingredient_id"] == product_ingredient.ingredient_id:
                             is_found = True
                             item["sales_consumed"] = item["sales_consumed"] + (product_ingredient.quantity * sales_item.quantity)
                     if is_found == False:
                         inventory_items.append({
-                            "ingredient_id": product_ingredient.id,
+                            "ingredient_id": product_ingredient.ingredient_id,
                             "ingredient_name": ingredient_query.name,
                             "ingredient_tolerance": ingredient_query.tolerance,
                             "inventory_consumed": 0,
