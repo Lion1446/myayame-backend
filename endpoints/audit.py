@@ -102,9 +102,9 @@ def audit():
             for item in inventory_items:
                 if item["sales_consumed"] != 0:
                     item["unit_difference"] = item["sales_consumed"] - item["inventory_consumed"]
-                    if item["unit_difference"] > item["tolerance"]:
+                    if item["unit_difference"] > item["ingredient_tolerance"]:
                         item["remarks"] = "underserved"
-                    elif item["unit_difference"] < -item["tolerance"]:
+                    elif item["unit_difference"] < -item["ingredient_tolerance"]:
                         item["remarks"] = "overserved"
                     else:
                         item["remarks"] = "okay"
