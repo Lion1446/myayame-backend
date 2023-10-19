@@ -85,7 +85,7 @@ def audit():
                     for item in inventory_items:
                         if item["ingredient_id"] == product_ingredient.id:
                             is_found = True
-                            item["sales_consumed"] = item["sales_consumed"] + (product_ingredient.quantity * sales_items_query.quantity)
+                            item["sales_consumed"] = item["sales_consumed"] + (product_ingredient.quantity * sales_item.quantity)
                     if is_found == False:
                         inventory_items.append({
                             "ingredient_id": product_ingredient.id,
@@ -95,7 +95,7 @@ def audit():
                             "inventory_expired": 0,
                             "inventory_spoiled": 0,
                             "inventory_bad_order": 0,
-                            "sales_consumed": product_ingredient.quantity * sales_items_query.quantity,
+                            "sales_consumed": product_ingredient.quantity * sales_item.quantity,
                             "unit_difference": 0,
                             "remarks": None,
                         })
