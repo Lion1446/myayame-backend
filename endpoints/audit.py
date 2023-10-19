@@ -73,7 +73,7 @@ def audit():
                 inventory_item["sales_consumed"] = 0
                 inventory_item["unit_difference"] = 0
                 inventory_item["remarks"] = None
-                inventory_item.append(inventory_item)
+                inventory_items.append(inventory_item)
             
             sales_items_query = SalesItem.query.filter(SalesItem.sales_id == sales.id).all()
             for sales_item in sales_items_query:
