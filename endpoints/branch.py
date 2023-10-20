@@ -73,7 +73,7 @@ def branches():
         response_body = {}
         response_body["status"] = 200
         response_body["remarks"] = "Success"
-        response_body["users"] = branches
+        response_body["branches"] = branches
         resp = make_response(response_body)
     except Exception as e:
         print(e)
