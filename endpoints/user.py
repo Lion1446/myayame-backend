@@ -37,7 +37,7 @@ def user():
                     resp = make_response({"status": 200, "remarks": "Success"})
             else:
                 resp = make_response({"status": 403, "remarks": "Access denied"})
-        elif request.method:
+        elif request.method == "GET":
             id = request.args.get('id')
             if id is None:
                 resp = make_response({"status": 400, "remarks": "Missing id in the query string"})
