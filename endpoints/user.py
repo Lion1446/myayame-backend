@@ -1,7 +1,7 @@
 from flask import Blueprint
 from flask import make_response, request
 import json
-from models import User
+from models import User, Branch
 from constants import *
 from models import db
 
@@ -47,6 +47,27 @@ def user():
                 response_body["status"] = 200
                 response_body["remarks"] = "Success"
                 resp = make_response(response_body)
+    except Exception as e:
+        print(e)
+        resp = make_response({"status": 500, "remarks": "Internal server error"})
+    resp.headers['Access-Control-Allow-Origin'] = '*'
+    return resp
+
+@user_blueprint.route('/users', methods=["GET"])
+def users():
+    try:
+        user_instances = User.query.all()
+        users = []
+        for instance in user_instances:
+            user = instance.to_map()
+            branch = Branch.query.filter(Branch.id == user.branch_id).first()
+            user["branch"] = branch.to_map()
+            users.append(user)
+        response_body = {}
+        response_body["status"] = 200
+        response_body["remarks"] = "Success"
+        response_body["users"] = users
+        resp = make_response(response_body)
     except Exception as e:
         print(e)
         resp = make_response({"status": 500, "remarks": "Internal server error"})
