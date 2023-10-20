@@ -8,7 +8,7 @@ from models import db
 user_blueprint = Blueprint('user_blueprint', __name__)
 
 # curl -X POST -d "{\"admin_auth_token\": \"WvNM3UJL2kHZQ1ewI7RzGxVh0n8o6YKS\", \"username\": \"lionelle1446\", \"password\": \"lionelle123\", \"fullname\": \"Lionelle Diaz\", \"branch_id\": 1, \"is_admin\": false}" -H "Content-Type: application/json" http://127.0.0.1:5000/user
-@user_blueprint.route('/user', methods=["POST", "GET"])
+@user_blueprint.route('/user', methods=["POST", "GET", "PATCH"])
 def user():
     try:
         if request.method == "POST":
@@ -56,7 +56,7 @@ def user():
                 return make_response({"status": 404, "remarks": "User not found"})
             request_data = request.data
             request_data = json.loads(request_data.decode('utf-8')) 
-            if request_data["auth_token"] in [AUTH_TOKEN, ADMIN_AUTH_TOKEN]:   
+            if request_data["auth_token"] in [ADMIN_AUTH_TOKEN]:   
                 user.password = request_data["password"]
                 user.fullname = request_data["fullname"]
                 user.branch_id = request_data["branch_id"]
