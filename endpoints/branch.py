@@ -43,3 +43,22 @@ def branch():
         resp = make_response({"status": 500, "remarks": "Internal server error"})
     resp.headers['Access-Control-Allow-Origin'] = '*'
     return resp
+
+@branch_blueprint.route('/branches', methods=["GET"])
+def branches():
+    try:
+        branch_instances = Branch.query.all()
+        branches = []
+        for instance in branch_instances:
+            branch = instance.to_map()
+            branches.append(branch)
+        response_body = {}
+        response_body["status"] = 200
+        response_body["remarks"] = "Success"
+        response_body["users"] = branches
+        resp = make_response(response_body)
+    except Exception as e:
+        print(e)
+        resp = make_response({"status": 500, "remarks": f"Internal server error: {e}"})
+    resp.headers['Access-Control-Allow-Origin'] = '*'
+    return resp
