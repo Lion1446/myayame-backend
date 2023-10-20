@@ -60,7 +60,7 @@ def users():
         users = []
         for instance in user_instances:
             user = instance.to_map()
-            branch = Branch.query.filter(Branch.id == user.branch_id).first()
+            branch = Branch.query.filter(Branch.id == user["branch_id"]).first()
             user["branch"] = branch.to_map()
             users.append(user)
         response_body = {}
