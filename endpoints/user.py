@@ -47,6 +47,24 @@ def user():
                 response_body["status"] = 200
                 response_body["remarks"] = "Success"
                 resp = make_response(response_body)
+        elif request.method == "PATCH":
+            id = request.args.get('id')
+            if id is None:
+                resp = make_response({"status": 400, "remarks": "Missing id in the query string"})
+            user = User. query.get(id)      
+            if user is None:
+                return make_response({"status": 404, "remarks": "User not found"})
+            request_data = request.data
+            request_data = json.loads(request_data.decode('utf-8')) 
+            if request_data["auth_token"] in [AUTH_TOKEN, ADMIN_AUTH_TOKEN]:   
+                user.password = request_data["password"]
+                user.fullname = request_data["fullname"]
+                user.branch_id = request_data["branch_id"]
+                user.is_admin = request_data["is_admin"]
+                db.session.commit()
+                return make_response({"status": 200, "remarks": "Success"})
+            else:
+                return make_response({"status": 403, "remarks": "Access denied"})
     except Exception as e:
         print(e)
         resp = make_response({"status": 500, "remarks": "Internal server error"})
