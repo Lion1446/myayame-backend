@@ -109,14 +109,14 @@ def product_ingredients():
                 resp = make_response({"status": 400, "remarks": "Missing id in the query string"})
             else:
                 product_ingredients = ProductIngredient.query.filter(ProductIngredient.product_id == product_id).all()
-                if len(product_ingredients) == 0:
+                if product_ingredients is None:
                     resp = make_response({"status": 404, "remarks": "No ingredients found for this product."})
                 else:
                     response_body = {}
                     response_body["product_ingredients"] = []
                     for pi in product_ingredients:
                         ingredient = Ingredients.query.filter(Ingredients.id == pi.ingredient_id).first()
-                        product_ingredient_detail = pi.to_map()
+                        product_ingredient_detail = {}
                         product_ingredient_detail["ingredient_details"] = ingredient.to_map()
                         response_body["product_ingredients"].append(product_ingredient_detail)
                     response_body["status"] = 200
