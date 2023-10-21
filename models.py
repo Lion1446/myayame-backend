@@ -98,3 +98,52 @@ class ProductIngredient(BaseModel):
             "quantity": self.quantity
         })
         return product_ingredient_data
+    
+class Inventory(BaseModel):
+    __tablename__ = "inventory"
+    branch_id = db.Column(db.Integer, nullable=False)
+    is_starting = db.Column(db.Boolean, nullable=False)
+
+    def to_map(self):
+        inventory_data = super().to_map()
+        inventory_data.update({
+            "branch_id": self.branch_id,
+            "is_starting": self.is_starting
+        })
+        return inventory_data
+    
+class InventoryItem(BaseModel):
+    __tablename__ = "inventory_item"
+    ingredient_id = db.Column(db.Integer, nullable=False)
+    inventory_id = db.Column(db.Integer, nullable=False)
+    quantity = db.Column(db.Float, nullable=False)
+    def to_map(self):
+        inventory_item_data = super().to_map()
+        inventory_item_data.update({
+            "ingredient_id": self.ingredient_id,
+            "inventory_id": self.inventory_id,
+            "quantity": self.quantity
+        })
+        return inventory_item_data
+
+
+class InventoryTransaction(BaseModel):
+    __tablename__ = "inventory_transaction"
+    branch_id = db.Column(db.Integer, nullable=False)
+    ingredient_id = db.Column(db.Integer, nullable=False)
+    user_id = db.Column(db.Integer, nullable=False)
+    transaction_type = db.Column(db.String(100), nullable=False)
+    quantity = db.Column(db.Float, nullable=False)
+    remarks = db.Column(db.String(100), nullable=False)
+
+    def to_map(self):
+        inventory_transaction_data = super().to_map()
+        inventory_transaction_data.update({
+            "branch_id": self.branch_id,
+            "ingredient_id": self.ingredient_id,
+            "user_id": self.user_id,
+            "transaction_type": self.transaction_type,
+            "quantity": self.quantity,
+            "remarks": self.remarks
+        })
+        return inventory_transaction_data
