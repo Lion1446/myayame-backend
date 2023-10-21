@@ -67,7 +67,7 @@ def user():
                 return make_response({"status": 403, "remarks": "Access denied"})
     except Exception as e:
         print(e)
-        resp = make_response({"status": 500, "remarks": "Internal server error"})
+        resp = make_response({"status": 500, "remarks": f"Internal server error: {e}"})
     resp.headers['Access-Control-Allow-Origin'] = '*'
     return resp
 
