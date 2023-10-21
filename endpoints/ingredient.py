@@ -34,7 +34,7 @@ def ingredients():
 
 
 # curl -X POST -d "{\"admin_auth_token\": \"WvNM3UJL2kHZQ1ewI7RzGxVh0n8o6YKS\", \"name\": \"Ayame - SM Seaside\"}" -H "Content-Type: application/json" http://127.0.0.1:5000/branch
-@ingredient_blueprint.route('/ingredient', methods = ["POST", "GET", "PUT", "DELETE"])
+@ingredient_blueprint.route('/ingredient', methods = ["POST", "GET", "PATCH", "DELETE"])
 def ingredient():
     try:
         if request.method == "POST":
@@ -76,7 +76,7 @@ def ingredient():
                     response_body["status"] = 200
                     response_body["remarks"] = "Success"
                     resp = make_response(response_body)
-        elif request.method == "PUT":
+        elif request.method == "PATCH":
             request_data = request.data
             request_data = json.loads(request_data.decode('utf-8')) 
             if request_data["auth_token"] in [AUTH_TOKEN, ADMIN_AUTH_TOKEN]:
@@ -90,7 +90,6 @@ def ingredient():
                     else:
                         instance.name = request_data["name"]
                         instance.unit = request_data["unit"]
-                        instance.branch_id = request_data["branch_id"]
                         instance.tolerance = request_data["tolerance"]
                         instance.category = request_data["category"]
                         db.session.commit()
