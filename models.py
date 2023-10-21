@@ -1,13 +1,8 @@
 from flask_sqlalchemy import SQLAlchemy     ## pip3 install Flask-SQLAlchemy
 from datetime import datetime, timedelta
-from enum import Enum
 
 db = SQLAlchemy()
 
-class UserType(Enum):
-    ADMIN = 1
-    AUDITOR = 2
-    USER = 3
 
 class BaseModel(db.Model):
     __abstract__ = True
@@ -42,7 +37,7 @@ class User(BaseModel):
     password = db.Column(db.String(100), nullable=False)
     fullname = db.Column(db.String(100), nullable=False)
     branch_id = db.Column(db.Integer, nullable=False)
-    user_type = db.Column(db.Enum(UserType), nullable=False)
+    user_type = db.Column(db.Integer, nullable=False)
     
     def to_map(self):
         user_data = super().to_map()  # Call the to_map method from BaseModel
