@@ -15,7 +15,7 @@ def login():
         user = User.query.filter(User.username == request_data["username"], User.password == request_data["password"]).first()
         if user:
             branch = Branch.query.filter(Branch.id == user.branch_id).first()
-            response_body = user.to_map()
+            response_body = {}
             response_body["status"] = 200
             response_body["remarks"] = "Success"
             response_body["branch"] = branch.to_map()
