@@ -24,7 +24,8 @@ def products():
                 else:
                     product = Products(
                         branch_id = request_data["branch_id"],
-                        name = request_data["name"]
+                        name = request_data["name"],
+                        price = request_data["price"]
                     )
                     db.session.add(product)
                     db.session.commit()
@@ -48,22 +49,21 @@ def products():
                     response_body["remarks"] = "Success"
                     resp = make_response(response_body)
         elif request.method == "DELETE":
-            product_id = request.args.get('product_id')
-            product_ingredients = ProductIngredient.query.filter(ProductIngredient.product_id == product_id).all()
-            if product_ingredients is not None:
-                for pi in product_ingredients:
-                    db.session.delete(pi)
-                db.session.commit()
-            product = Products.query.get(product_id)
+            id = request.args.get('id')
+            product = Products.query.get(id)
             if product is None:
                 resp = make_response({"status": 404, "remarks": "Product not found"})
             else:
+                product_ingredients = ProductIngredient.query.filter(ProductIngredient.product_id == id).all()
+                if product_ingredients is not None:
+                    for pi in product_ingredients:
+                        db.session.delete(pi)
                 db.session.delete(product)
                 db.session.commit()
                 resp = make_response({"status": 200, "remarks": "Success"})
         elif request.method == "PATCH":
-            product_id = request.args.get('product_id')
-            product = Products.query.get(product_id)
+            id = request.args.get('id')
+            product = Products.query.get(id)
             if product is None:
                 resp = make_response({"status": 404, "remarks": "Product not found"})
             else:
@@ -71,6 +71,7 @@ def products():
                 request_data = json.loads(request_data.decode('utf-8')) 
                 if request_data["auth_token"] in [AUTH_TOKEN, ADMIN_AUTH_TOKEN]:
                     product.name = request_data["name"]
+                    product.price = request_data["price"]
                     db.session.commit()
                     resp = make_response({"status": 200, "remarks": "Success"})
                 else:
@@ -122,7 +123,7 @@ def product_ingredients():
                     response_body["remarks"] = "Success"
                     resp = make_response(response_body)
         elif request.method == "DELETE":
-            id = request.args.get('product_id')
+            id = request.args.get('id')
             pi = ProductIngredient.query.get(id)
             if pi is None:
                 resp = make_response({"status": 404, "remarks": "Product Ingredient not found"})
@@ -131,7 +132,7 @@ def product_ingredients():
                 db.session.commit()
                 resp = make_response({"status": 200, "remarks": "Product Ingredient deleted successfully"})
         elif request.method == "PATCH":
-            id = request.args.get('product_id')
+            id = request.args.get('id')
             pi = ProductIngredient.query.get(id)
             if pi is None:
                 resp = make_response({"status": 404, "remarks": "Product Ingredient not found"})
