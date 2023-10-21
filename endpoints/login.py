@@ -20,7 +20,7 @@ def login():
             response_body["remarks"] = "Success"
             response_body["branch"] = branch.to_map()
             response_body["user"] = user.to_map()
-            if response_body["user_type"] == 1:
+            if user.user_type == 1:
                 response_body["auth_token"] = ADMIN_AUTH_TOKEN
             else:
                 response_body["auth_token"] = AUTH_TOKEN
