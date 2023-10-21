@@ -20,7 +20,7 @@ def login():
             response_body["status"] = 200
             response_body["remarks"] = "Success"
             response_body["branch_name"] = branch.name
-            if response_body["is_admin"]:
+            if response_body["user_type"] == 1:
                 response_body["auth_token"] = ADMIN_AUTH_TOKEN
             else:
                 response_body["auth_token"] = AUTH_TOKEN
