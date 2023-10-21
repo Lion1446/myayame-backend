@@ -109,7 +109,7 @@ def product_ingredients():
                 resp = make_response({"status": 400, "remarks": "Missing id in the query string"})
             else:
                 product_ingredients = ProductIngredient.query.filter(ProductIngredient.product_id == product_id).all()
-                if product_ingredients is None:
+                if len(product_ingredients) == 0:
                     resp = make_response({"status": 404, "remarks": "No ingredients found for this product."})
                 else:
                     response_body = {}
