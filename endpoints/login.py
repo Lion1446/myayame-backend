@@ -13,13 +13,13 @@ def login():
         request_data = request.data
         request_data = json.loads(request_data.decode('utf-8')) 
         user = User.query.filter(User.username == request_data["username"], User.password == request_data["password"]).first()
-        print("here")
         if user:
             branch = Branch.query.filter(Branch.id == user.branch_id).first()
             response_body = user.to_map()
             response_body["status"] = 200
             response_body["remarks"] = "Success"
-            response_body["branch_name"] = branch.name
+            response_body["branch"] = branch.to_map()
+            response_body["user"] = user.to_map()
             if response_body["user_type"] == 1:
                 response_body["auth_token"] = ADMIN_AUTH_TOKEN
             else:
