@@ -20,7 +20,7 @@ def user():
                     User.password == request_data["password"],
                     User.fullname == request_data["fullname"],
                     User.branch_id == request_data["branch_id"],
-                    User.is_admin == request_data["is_admin"],
+                    User.user_type == request_data["user_type"],
                     ).all()
                 if query:
                     resp = make_response({"status": 400, "remarks": "User already exists."})
@@ -30,7 +30,7 @@ def user():
                         password = request_data["password"],
                         fullname = request_data["fullname"],
                         branch_id = request_data["branch_id"],
-                        is_admin = request_data["is_admin"],
+                        user_type = request_data["user_type"],
                     )
                     db.session.add(instance)
                     db.session.commit()
@@ -56,11 +56,11 @@ def user():
                 return make_response({"status": 404, "remarks": "User not found"})
             request_data = request.data
             request_data = json.loads(request_data.decode('utf-8')) 
-            if request_data["auth_token"] in [ADMIN_AUTH_TOKEN]:   
+            if request_data["auth_token"] == ADMIN_AUTH_TOKEN:   
                 user.password = request_data["password"]
                 user.fullname = request_data["fullname"]
                 user.branch_id = request_data["branch_id"]
-                user.is_admin = request_data["is_admin"]
+                user.user_type = request_data["user_type"]
                 db.session.commit()
                 return make_response({"status": 200, "remarks": "Success"})
             else:
