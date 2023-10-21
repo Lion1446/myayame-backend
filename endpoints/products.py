@@ -116,7 +116,7 @@ def product_ingredients():
                     response_body["product_ingredients"] = []
                     for pi in product_ingredients:
                         ingredient = Ingredients.query.filter(Ingredients.id == pi.ingredient_id).first()
-                        product_ingredient_detail = {}
+                        product_ingredient_detail = pi.to_map()
                         product_ingredient_detail["ingredient_details"] = ingredient.to_map()
                         response_body["product_ingredients"].append(product_ingredient_detail)
                     response_body["status"] = 200

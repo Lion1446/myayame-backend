@@ -1,7 +1,7 @@
 from flask import Blueprint
 from flask import make_response, request
 import json
-from models import Ingredients
+from models import Ingredients, ProductIngredient
 from constants import *
 from models import db
 
@@ -102,6 +102,8 @@ def ingredient():
             if instance is None:
                 resp = make_response({"status": 404, "remarks": "Ingredient does not exist."})
             else:
+                pi = ProductIngredient.query.filter(ProductIngredient.ingredient_id == id).first()
+                db.session.delete(pi)
                 db.session.delete(instance)
                 db.session.commit()
                 resp = make_response({"status": 200, "remarks": "Success"})
