@@ -1,149 +1,105 @@
 from flask_sqlalchemy import SQLAlchemy     ## pip3 install Flask-SQLAlchemy
-from datetime import datetime
+from datetime import datetime, timedelta
+from enum import Enum
 
 db = SQLAlchemy()
 
-class Branch(db.Model):
-    __tablename__ = "branch"
+class UserType(Enum):
+    ADMIN = 1
+    AUDITOR = 2
+    USER = 3
+
+class BaseModel(db.Model):
+    __abstract__ = True
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
+    datetime_created = db.Column(db.DateTime, default=datetime.utcnow() + timedelta(hours=8))
+    datetime_deleted = db.Column(db.DateTime, default=None, nullable=True)
+
+    def delete(self):
+        self.datetime_deleted = datetime.utcnow() + timedelta(hours=8)
+        db.session.commit()
 
     def to_map(self):
         return {
             "id": self.id,
-            "name": self.name
+            "datetime_created": self.datetime_created,
+            "datetime_deleted": self.datetime_deleted
         }
 
+class Branch(BaseModel):
+    __tablename__ = "branch"
+    name = db.Column(db.String(100), nullable=False)
 
-class User(db.Model):
+    def to_map(self):
+        branch_data = super().to_map()  # Call the to_map method from BaseModel
+        branch_data["name"] = self.name
+        return branch_data
+
+
+class User(BaseModel):
     __tablename__ = "user"
-    id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), nullable=False)
     password = db.Column(db.String(100), nullable=False)
     fullname = db.Column(db.String(100), nullable=False)
     branch_id = db.Column(db.Integer, nullable=False)
-    is_admin = db.Column(db.Boolean, nullable=False)
-     
+    user_type = db.Column(db.Enum(UserType), nullable=False)
+    
     def to_map(self):
-        return {
-            "id": self.id,
+        user_data = super().to_map()  # Call the to_map method from BaseModel
+        user_data.update({
             "username": self.username,
             "password": self.password,
             "fullname": self.fullname,
             "branch_id": self.branch_id,
-            "is_admin": self.is_admin
-        }
+            "user_type": self.user_type
+        })
+        return user_data
 
-class Ingredients(db.Model):
+class Ingredients(BaseModel):
     __tablename__ = "ingredients"
-    id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     unit = db.Column(db.String(10), nullable=False)
     branch_id = db.Column(db.Integer, nullable=False)
     tolerance = db.Column(db.Float, nullable=False)
     category = db.Column(db.String(100), nullable=False)
 
-
     def to_map(self):
-        return {
-            "id": self.id,
+        ingredient_data = super().to_map()
+        ingredient_data.update({
             "name": self.name,
             "unit": self.unit,
             "branch_id": self.branch_id,
             "tolerance": self.tolerance,
             "category": self.category
-        }
+        })
+        return ingredient_data
 
-class Inventory(db.Model):
-    __tablename__ = "inventory"
-    id = db.Column(db.Integer, primary_key=True)
-    branch_id = db.Column(db.Integer, nullable=False)
-    datetime_created = db.Column(db.DateTime, nullable=False, default=datetime.now())
-    is_starting = db.Column(db.Boolean, nullable=False)
-
-
-    def to_map(self):
-        return {
-            "id": self.id,
-            "datetime_created": self.datetime_created,
-            "is_starting": self.is_starting
-        }
-
-class Item(db.Model):
-    __tablename__ = "item"
-    id = db.Column(db.Integer, primary_key=True)
-    ingredient_id = db.Column(db.Integer, nullable=False)
-    inventory_id = db.Column(db.Integer, nullable=False)
-    quantity = db.Column(db.Float, nullable=False)
-    consumed = db.Column(db.Float, nullable=False)
-    expired = db.Column(db.Float, nullable=False)
-    spoiled = db.Column(db.Float, nullable=False)
-    bad_order = db.Column(db.Float, nullable=False)
-
-    def to_map(self):
-        return {
-            "id": self.id,
-            "ingredient_id": self.ingredient_id,
-            "inventory_id": self.inventory_id,
-            "quantity": self.quantity,
-            "consumed": self.consumed,
-            "expired": self.expired,
-            "spoiled": self.spoiled,
-            "bad_order": self.bad_order
-        }
-
-class Products(db.Model):
+class Products(BaseModel):
     __tablename__ = "products"
-    id = db.Column(db.Integer, primary_key=True)
     branch_id = db.Column(db.Integer, nullable=False)
     name = db.Column(db.String(100), nullable=False)
+    price = db.Column(db.Float, nullable=False)
 
     def to_map(self):
-        return {
-            "id": self.id,
+        product_data = super().to_map()
+        product_data.update({
             "branch_id": self.branch_id,
-            "name": self.name
-        }
-    
-class ProductIngredient(db.Model):
+            "name": self.name,
+            "price": self.price
+        })
+        return product_data
+
+class ProductIngredient(BaseModel):
     __tablename__ = "product_ingredient"
-    id = db.Column(db.Integer, primary_key=True)
     product_id = db.Column(db.Integer, nullable=False)
     ingredient_id = db.Column(db.Integer, nullable=False)
     quantity = db.Column(db.Float, nullable=False)
 
     def to_map(self):
-        return {
-            "id": self.id,
+        product_ingredient_data = super().to_map()
+        product_ingredient_data.update({
             "product_id": self.product_id,
             "ingredient_id": self.ingredient_id,
             "quantity": self.quantity
-        }
-    
-class Sales(db.Model):
-    __tablename__ = "sales"
-    id = db.Column(db.Integer, primary_key=True)
-    datetime_created = db.Column(db.DateTime, nullable=False, default=datetime.now())
-    branch_id = db.Column(db.Integer, nullable=False)
-
-    def to_map(self):
-        return {
-            "id": self.id,
-            "datetime_created": self.datetime_created,
-            "branch_id": self.branch_id
-        }
-
-class SalesItem(db.Model):
-    __tablename__ = "sales_item"
-    id = db.Column(db.Integer, primary_key=True)
-    sales_id = db.Column(db.Integer, nullable=False)
-    product_id = db.Column(db.Integer, nullable=False)
-    quantity = db.Column(db.Integer, nullable=False)
-
-    def to_map(self):
-        return {
-            "id": self.id,
-            "sales_id": self.sales_id,
-            "product_id": self.product_id,
-            "quantity": self.quantity
-        }
+        })
+        return product_ingredient_data

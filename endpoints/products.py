@@ -38,7 +38,7 @@ def products():
             else:
                 products = Products.query.filter(Products.branch_id == branch_id).all()
                 if products is None:
-                    resp = make_response({"status": 404, "remarks": "Store doesn't have products yet."})
+                    resp = make_response({"status": 200, "remarks": "Store doesn't have products yet."})
                 else:
                     response_body = {}
                     response_body["products"] = []
