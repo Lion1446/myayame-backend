@@ -7,7 +7,7 @@ db = SQLAlchemy()
 class BaseModel(db.Model):
     __abstract__ = True
     id = db.Column(db.Integer, primary_key=True)
-    datetime_created = db.Column(db.DateTime, nullable=False)
+    datetime_created = db.Column(db.DateTime, default=lambda: datetime.utcnow() + timedelta(hours=8))
     datetime_deleted = db.Column(db.DateTime, default=None, nullable=True)
 
     def to_map(self):

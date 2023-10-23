@@ -4,7 +4,6 @@ import json
 from models import User, Branch
 from constants import *
 from models import db
-from datetime import datetime, timedelta
 
 user_blueprint = Blueprint('user_blueprint', __name__)
 
@@ -31,8 +30,7 @@ def user():
                         password = request_data["password"],
                         fullname = request_data["fullname"],
                         branch_id = request_data["branch_id"],
-                        user_type = request_data["user_type"],
-                        datetime_created = datetime.utcnow() + timedelta(hours=8)
+                        user_type = request_data["user_type"]
                     )
                     db.session.add(instance)
                     db.session.commit()

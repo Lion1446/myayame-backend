@@ -4,7 +4,6 @@ import json
 from models import Branch
 from constants import *
 from models import db
-from datetime import datetime, timedelta
 
 branch_blueprint = Blueprint('branch_blueprint', __name__)
 
@@ -23,7 +22,6 @@ def branch():
                 else:
                     instance = Branch(
                         name = request_data["name"],
-                        datetime_created = datetime.utcnow() + timedelta(hours=8)
                     )
                     db.session.add(instance)
                     db.session.commit()
