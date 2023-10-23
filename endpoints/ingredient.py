@@ -4,6 +4,7 @@ import json
 from models import Ingredients, ProductIngredient
 from constants import *
 from models import db
+from datetime import datetime, timedelta
 
 ingredient_blueprint = Blueprint('ingredient_blueprint', __name__)
 
@@ -56,7 +57,8 @@ def ingredient():
                         unit = request_data["unit"],
                         branch_id = request_data["branch_id"],
                         tolerance = request_data["tolerance"],
-                        category = request_data["category"]
+                        category = request_data["category"],
+                        datetime_created = datetime.utcnow() + timedelta(hours=8)
                     )
                     db.session.add(instance)
                     db.session.commit()

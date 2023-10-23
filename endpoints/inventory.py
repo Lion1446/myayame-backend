@@ -7,6 +7,7 @@ import json
 from models import Inventory, InventoryItem, Ingredients, InventoryTransaction
 from constants import *
 from models import db
+from datetime import datetime, timedelta
 
 inventory_blueprint = Blueprint('inventory_blueprint', __name__)
 
@@ -87,7 +88,8 @@ def inventory_closing():
                 formatted_date = datetime.datetime.strptime(request_data['date'], "%m/%d/%Y %H:%M:%S")
                 closing_inventory = Inventory(
                     branch_id = request_data["branch_id"],
-                    is_starting = False
+                    is_starting = False,
+                    datetime_created = formatted_date
                 )
                 db.session.add(closing_inventory)
                 db.session.commit()
@@ -96,7 +98,8 @@ def inventory_closing():
                 next_day = closing_inventory.datetime_created + timedelta(days=1)
                 opening_inventory = Inventory(
                     branch_id = request_data["branch_id"],
-                    is_starting = True
+                    is_starting = True,
+                    datetime_created = next_day
                 )
                 db.session.add(opening_inventory)
                 db.session.commit()
@@ -107,14 +110,18 @@ def inventory_closing():
                     closing_item = InventoryItem(
                         ingredient_id = item["ingredient_id"],
                         inventory_id = closing_inventory.id,
-                        quantity = item["new_quantity"]
+                        quantity = item["new_quantity"],
+                        datetime_created = datetime.utcnow() + timedelta(hours=8)
                     )
                     db.session.add(closing_item)
                     db.session.commit()
+                    next_day = datetime.utcnow() + timedelta(days=1)
+                    midnight_next_day = datetime(next_day.year, next_day.month, next_day.day, 0, 0, 0)
                     opening_item = InventoryItem(
                         ingredient_id = item["ingredient_id"],
                         inventory_id = opening_inventory.id,
-                        quantity = item["new_quantity"]
+                        quantity = item["new_quantity"],
+                        datetime_created = midnight_next_day
                     )
                     db.session.add(opening_item)
                     db.session.commit() 
@@ -140,7 +147,7 @@ def inventory_transaction():
                 transactions_query = InventoryTransaction.query.filter(
                     func.DATE(InventoryTransaction.datetime_created) == formatted_date.date(),
                     InventoryTransaction.branch_id == branch_id
-                ).order_by(InventoryTransaction.datetime_created.desc()).all()
+                ).all()
                 response_body = {}
                 if transactions_query is None:
                     response_body["status"] = 404
