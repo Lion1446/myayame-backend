@@ -152,7 +152,7 @@ def inventory_transaction():
                     for transaction_query in transactions_query:
                         transaction = {}
                         transaction["details"] = transaction_query.to_map()
-                        ingredient = Ingredients.query.get(transaction_query.ingredient_id).first()
+                        ingredient = Ingredients.query.get(transaction_query.ingredient_id)
                         transaction["ingredient"] = ingredient.to_map()
                         response_body["transactions"].append(transaction)
                 resp = make_response(response_body)
