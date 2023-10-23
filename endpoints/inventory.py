@@ -140,7 +140,7 @@ def inventory_transaction():
                 transactions_query = InventoryTransaction.query.filter(
                     func.DATE(InventoryTransaction.datetime_created) == formatted_date.date(),
                     InventoryTransaction.branch_id == branch_id
-                ).all()
+                ).order_by(InventoryTransaction.datetime_created.desc()).all()
                 response_body = {}
                 if transactions_query is None:
                     response_body["status"] = 404
