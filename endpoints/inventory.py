@@ -1,5 +1,3 @@
-import datetime
-from datetime import timedelta
 from sqlalchemy import func
 from flask import Blueprint
 from flask import make_response, request
@@ -20,7 +18,7 @@ def inventory_starting():
             if date is None or branch_id is None:
                 resp = make_response({"status": 400, "remarks": "Missing required parameters in the query string"})
             else:
-                formatted_date = datetime.datetime.strptime(date, "%m/%d/%Y %H:%M:%S")
+                formatted_date = datetime.strptime(date, "%m/%d/%Y %H:%M:%S")
                 inventory = Inventory.query.filter(
                         func.DATE(Inventory.datetime_created) == formatted_date.date(),
                         Inventory.is_starting == True,
@@ -57,7 +55,7 @@ def inventory_closing():
             if date is None or branch_id is None:
                 resp = make_response({"status": 400, "remarks": "Missing required parameters in the query string"})
             else:
-                formatted_date = datetime.datetime.strptime(date, "%m/%d/%Y %H:%M:%S")
+                formatted_date = datetime.strptime(date, "%m/%d/%Y %H:%M:%S")
                 inventory = Inventory.query.filter(
                         func.DATE(Inventory.datetime_created) == formatted_date.date(),
                         Inventory.is_starting == False,
@@ -85,7 +83,7 @@ def inventory_closing():
             request_data = json.loads(request_data.decode('utf-8')) 
             if request_data["auth_token"] in [AUTH_TOKEN, ADMIN_AUTH_TOKEN]:
                 # get the closing inventory based on date and branch
-                formatted_date = datetime.datetime.strptime(request_data['date'], "%m/%d/%Y %H:%M:%S")
+                formatted_date = datetime.strptime(request_data['date'], "%m/%d/%Y %H:%M:%S")
                 closing_inventory = Inventory(
                     branch_id = request_data["branch_id"],
                     is_starting = False,
@@ -143,7 +141,7 @@ def inventory_transaction():
             if date is None or branch_id is None:
                 resp = make_response({"status": 400, "remarks": "Missing required parameters in the query string"})
             else:
-                formatted_date = datetime.datetime.strptime(date, "%m/%d/%Y %H:%M:%S")
+                formatted_date = datetime.strptime(date, "%m/%d/%Y %H:%M:%S")
                 transactions_query = InventoryTransaction.query.filter(
                     func.DATE(InventoryTransaction.datetime_created) == formatted_date.date(),
                     InventoryTransaction.branch_id == branch_id
