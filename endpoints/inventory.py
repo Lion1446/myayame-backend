@@ -41,6 +41,56 @@ def inventory_starting():
                     response_body["status"] = 200
                     response_body["remarks"] = "Success"
                     resp = make_response(response_body)
+        elif request.method == "POST":
+            request_data = request.data
+            request_data = json.loads(request_data.decode('utf-8')) 
+            if request_data["auth_token"] in [AUTH_TOKEN, ADMIN_AUTH_TOKEN]:
+                # get the closing inventory based on date and branch
+                formatted_date = datetime.strptime(request_data['date'], "%m/%d/%Y %H:%M:%S")
+                opening_inventory = Inventory(
+                    branch_id = request_data["branch_id"],
+                    is_starting = False,
+                    datetime_created = formatted_date
+                )
+                db.session.add(opening_inventory)
+                db.session.commit()
+                resp = make_response({"status": 200, "remarks": "Succeess"})
+    except Exception as e:
+        resp = make_response({"status": 500, "remarks": f"Internal server error: {e}"})
+    resp.headers['Access-Control-Allow-Origin'] = '*'
+    return resp
+
+@inventory_blueprint.route('/inventory_starting_item', methods=["POST"])
+def inventory_starting_item():
+    try:
+        if request.method == "POST":
+            request_data = request.data
+            request_data = json.loads(request_data.decode('utf-8')) 
+            if request_data["auth_token"] in [AUTH_TOKEN, ADMIN_AUTH_TOKEN]:
+                formatted_date = datetime.strptime(request_data['date'], "%m/%d/%Y %H:%M:%S")
+                inventory = Inventory.query.filter(
+                        func.DATE(Inventory.datetime_created) == formatted_date.date(),
+                        Inventory.is_starting == True,
+                        Inventory.branch_id == request_data['branch_id']
+                    ).first()
+                if inventory is None:
+                    inventory = Inventory(
+                        branch_id = request_data["branch_id"],
+                        is_starting = True,
+                        datetime_created = formatted_date
+                    )
+                    db.session.add(inventory)
+                    db.session.commit()
+                inventory_item = InventoryItem(
+                    ingredient_id = request_data["ingredient_id"],
+                    inventory_id = inventory.id,
+                    quantity = request_data["quantity"]
+                )
+                db.session.add(inventory_item)
+                db.session.commit()
+                resp = make_response({"status": 200, "remarks": "Success"})
+            else:
+                resp = make_response({"status": 403, "remarks": "Access denied"})
     except Exception as e:
         resp = make_response({"status": 500, "remarks": f"Internal server error: {e}"})
     resp.headers['Access-Control-Allow-Origin'] = '*'
