@@ -159,7 +159,8 @@ def inventory_closing():
                         ingredient_id = item["ingredient_id"],
                         inventory_id = closing_inventory.id,
                         quantity = item["new_quantity"],
-                        datetime_created = datetime.utcnow() + timedelta(hours=8)
+                        datetime_created = datetime.utcnow() + timedelta(hours=8),
+                        remarks = item["remarks"]
                     )
                     db.session.add(closing_item)
                     db.session.commit()

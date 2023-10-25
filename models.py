@@ -104,7 +104,7 @@ class Inventory(BaseModel):
         inventory_data = super().to_map()
         inventory_data.update({
             "branch_id": self.branch_id,
-            "is_starting": self.is_starting
+            "is_starting": self.is_starting,
         })
         return inventory_data
     
@@ -113,12 +113,15 @@ class InventoryItem(BaseModel):
     ingredient_id = db.Column(db.Integer, nullable=False)
     inventory_id = db.Column(db.Integer, nullable=False)
     quantity = db.Column(db.Float, nullable=False)
+    remarks = db.Column(db.String(100), nullable=True)
+
     def to_map(self):
         inventory_item_data = super().to_map()
         inventory_item_data.update({
             "ingredient_id": self.ingredient_id,
             "inventory_id": self.inventory_id,
-            "quantity": self.quantity
+            "quantity": self.quantity,
+            "remarks": self.remarks
         })
         return inventory_item_data
 
