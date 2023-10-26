@@ -1,7 +1,7 @@
 import datetime
 import json
 from flask import Blueprint, make_response, request, jsonify
-from models import db, Sales, SalesItem, Products
+from models import db, Sales, SalesItem, Products, ProductIngredient, Ingredients, InventoryTransaction
 from sqlalchemy import func
 from constants import AUTH_TOKEN, ADMIN_AUTH_TOKEN    
 
@@ -46,6 +46,20 @@ def get_sales():
                     else:
                         sales_item = SalesItem(product_id = request_data["product_id"], quantity = request_data["quantity"], sales_id = sales_query.id)
                         db.session.add(sales_item)
+                    ## get product here and its ingredients
+                    product = Products.query.get(request_data["product_id"])
+                    product_ingredients = ProductIngredient.query.filter(ProductIngredient.product_id == product.id).all()
+                    for product_ingredient in product_ingredients:
+                        sale_transaction = InventoryTransaction(
+                            branch_id = request_data["branch_id"],
+                            ingredient_id = product_ingredient.ingredient_id,
+                            user_id = request_data["user_id"],
+                            transaction_type = "sale",
+                            quantity = product_ingredient.quantity * request_data["quantity"] * -1,
+                            remarks = product.name,
+                        )
+                        db.session.add(sale_transaction)
+                    ## make a transaction of these ingredients
                     db.session.commit()
                     return make_response({"status": 200, "remarks": "Success"})
                 else:
@@ -54,6 +68,20 @@ def get_sales():
                     db.session.commit()
                     sales_item = SalesItem(product_id = request_data["product_id"], quantity = request_data["quantity"], sales_id = sales.id)
                     db.session.add(sales_item)
+                    ## get product here and its ingredients
+                    product = Products.query.get(request_data["product_id"])
+                    product_ingredients = ProductIngredient.query.filter(ProductIngredient.product_id == product.id).all()
+                    for product_ingredient in product_ingredients:
+                        sale_transaction = InventoryTransaction(
+                            branch_id = request_data["branch_id"],
+                            ingredient_id = product_ingredient.ingredient_id,
+                            user_id = request_data["user_id"],
+                            transaction_type = "sale",
+                            quantity = product_ingredient.quantity * request_data["quantity"] * -1,
+                            remarks = product.name,
+                        )
+                        db.session.add(sale_transaction)
+                    ## make a transaction of these ingredients
                     db.session.commit()
                     return make_response({"status": 200, "remarks": "Success"})
             else:
