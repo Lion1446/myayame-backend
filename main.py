@@ -1,4 +1,4 @@
-from flask import Flask, make_response, request
+from flask import Flask, make_response
 from models import *
 from constants import *
 from endpoints.login import login_blueprint
@@ -14,8 +14,10 @@ from endpoints.sales import sales_blueprint
 ## ======================= STARTUPS =================================
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] =\
-        'sqlite:///' + os.path.join(basedir, 'database.db')
+# app.config['SQLALCHEMY_DATABASE_URI'] =\
+#         'sqlite:///' + os.path.join(basedir, 'database.db')
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://dbuser:Heleadsm3!2#@172.104.175.65:5231/lionel'
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 
